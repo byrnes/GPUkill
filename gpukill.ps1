@@ -1,5 +1,9 @@
 Add-Type -AssemblyName System.Windows.Forms
 
+if (-NOT(Test-Path -Path 'C:\Program Files\NVIDIA Corporation\NVSMI\')) {
+    Write-Host "Nvidia-SMI not found"
+    exit
+}
 $pidList = 'C:\Program Files\NVIDIA Corporation\NVSMI\nvidia-smi.exe'
 $tmp = (& $pidList --query-compute-apps=pid --format=csv)
 $output += $tmp.split(' ')
