@@ -26,9 +26,7 @@ if (-NOT ($output.Length -eq 1)) {
                     Write-Host $i
                     Stop-Process -Id $i -Force
                 }
-            
             }
-    
         } 
         "Cancel" {
             write-host "You pressed Cancel"
