@@ -9,18 +9,28 @@ $tmp = (& $pidList --query-compute-apps=pid --format=csv)
 $output += $tmp.split(' ')
 Write-Host $output
 foreach ($i in $output) {
-    if (-NOT ($i -eq 'pid')) {
+    if ((-NOT ($i -eq 'pid')) -and (-NOT (Get-Process -Id $i | Select-Object -ExcludeProperty Name) -eq "dwm")) {
         $names += Get-Process -Id $i | Select-Object -ExpandProperty Name
+        $names += ", "
     }
 }
-Write-Host $names
+
+foreach ($i in $output) {
+    if ((-NOT ($i -eq 'pid')) -and (-NOT (Get-Process -Id $i | Select-Object -ExcludeProperty Name) -eq "dwm")) {
+        $list += $i
+        $list += ", "
+    }
+}
+
+Write-Host "output: " $list
+Write-Host "output length" $output.length
 
 if (-NOT ($output.Length -eq 1)) {
 
     $oReturn = [System.Windows.Forms.MessageBox]::Show("Do you want to kill the following processes:" + $names, "GPUKill", [System.Windows.Forms.MessageBoxButtons]::OKCancel)	
     switch ($oReturn) {
         "OK" {
-            write-host "You pressed OK"
+            Write-Host "You pressed OK"
             foreach ($i in $output) {
                 if (-NOT ($i -eq 'pid')) {
                     Write-Host $i
@@ -29,7 +39,7 @@ if (-NOT ($output.Length -eq 1)) {
             }
         } 
         "Cancel" {
-            write-host "You pressed Cancel"
+            Write-Host "You pressed Cancel"
         } 
     }
 }
