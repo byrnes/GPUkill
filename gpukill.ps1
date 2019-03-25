@@ -7,25 +7,17 @@ if (-NOT(Test-Path -Path 'C:\Program Files\NVIDIA Corporation\NVSMI\')) {
 $pidList = 'C:\Program Files\NVIDIA Corporation\NVSMI\nvidia-smi.exe'
 $tmp = (& $pidList --query-compute-apps=pid --format=csv)
 $output += $tmp.split(' ')
-Write-Host $output
 foreach ($i in $output) {
-    if ((-NOT ($i -eq 'pid')) -and (-NOT (Get-Process -Id $i | Select-Object -ExcludeProperty Name) -eq "dwm")) {
-        $names += Get-Process -Id $i | Select-Object -ExpandProperty Name
-        $names += ", "
+    if (-NOT ($i -eq 'pid')) {
+        if (-NOT ((Get-Process -Id $i | Select-Object -ExpandProperty Name) -eq "dwm")) {
+            $list += $i 
+            $names += Get-Process -Id $i | Select-Object -ExpandProperty Name
+            $names += ", "
+        }
     }
 }
 
-foreach ($i in $output) {
-    if ((-NOT ($i -eq 'pid')) -and (-NOT (Get-Process -Id $i | Select-Object -ExcludeProperty Name) -eq "dwm")) {
-        $list += $i
-        $list += ", "
-    }
-}
-
-Write-Host "output: " $list
-Write-Host "output length" $output.length
-
-if (-NOT ($output.Length -eq 1)) {
+if (-NOT ($list.length -eq 0)) {
 
     $oReturn = [System.Windows.Forms.MessageBox]::Show("Do you want to kill the following processes:" + $names, "GPUKill", [System.Windows.Forms.MessageBoxButtons]::OKCancel)	
     switch ($oReturn) {
